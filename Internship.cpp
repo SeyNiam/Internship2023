@@ -1,13 +1,7 @@
-﻿// Internship.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <fstream>
-
-#include <vector>
-
 
 using namespace std;
 
@@ -157,6 +151,7 @@ Player giveCat(Player p) {
 
 
 void writeDB(string path, Player p) {
+    // Открытие файла на запись
     ofstream fout;
     fout.open(path, ofstream::app);
 
@@ -166,8 +161,10 @@ void writeDB(string path, Player p) {
     else {
         //cout << "Файл открыт!\n";
         fout.write((char*)&p, sizeof(Player));
+        //fout.write((char*)&p, sizeof(p));
     }
     fout.close();
+    
 }
 
 void readDB(string path) {
@@ -192,8 +189,12 @@ void readDB(string path) {
 
 void taskOne() {
     string path = "bd.txt";
-
     Player player;
+
+    // Отчистка файла перед новой записью
+    fstream clear_file(path, ios::out);
+    clear_file.close();
+
     /*
     for (int i = 0; i <= 1; i++) {
         player.n = i;
@@ -213,9 +214,7 @@ void taskOne() {
         writeDB(path, player);
     }
 
-
     readDB(path);
-
 }
 
 
@@ -232,7 +231,7 @@ int taskTwo() {
     cout << "\n";
 
     int* weights = new int[n];
-    int* weights_reset = new int[n];
+    //int* weights_reset = new int[n];
 
     for (int i = 0; i < n; i++) {
         int j = i + 1;
@@ -246,7 +245,7 @@ int taskTwo() {
             cout << "\tОШИБКА\n\tВведите вес кролика " << j << " (1-109) и больше предыдущего: ";
             cin >> weights[i];
         }
-        weights_reset[i] = weights[i];
+        //weights_reset[i] = weights[i];
     }
 
     int m;
@@ -323,7 +322,7 @@ int taskTwo() {
     }
 
     delete[] weights; // Освобождение памяти
-    delete[] weights_reset;
+    //delete[] weights_reset;
 
     return 0;
 }
@@ -354,12 +353,6 @@ int main()
             break;
         }
     }
-
-    /*
-    string tmp;
-    tmp = taskOne();
-    cout << "\n" << tmp << endl;
-    */
 
     return 0;
 }
