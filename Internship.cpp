@@ -6,25 +6,21 @@
 #include <iostream>
 #include <fstream>
 
+#include <vector>
+
+
 using namespace std;
 
 
 class Player {
 public:
     Player(){
-        h = w = s = r = p = 0;
+        n = h = w = s = r = p = 0;
         cat = 3;
-    }
-    Player(int h, int w, int s, int r, int p) {
-        this->h = h;
-        this->w = w;
-        this->s = s;
-        this->r = r;
-        this->p = p;
     }
 
     void Print() {
-        cout << "\n " << n << "\tH: " << h << "\tW: " << w << "\tS: " << s << "\tR: " << r << "\tP: " << p << "\tCategory: " << cat << endl;
+        cout << "\n " << n << "\t Рост: " << h << "\t Размах: " << w << "\t Очки: " << s << "\t Подборы: " << r << "\t Передачи: " << p << "\t Категория: " << cat << endl;
     }
 
     int n; // Номер
@@ -35,81 +31,6 @@ public:
     int p; // Среднее количество передач за матч
     int cat; // Категория: 0 - единорог, 1 - игрок, достойный выбора в первом раунде, 2 - во втором, 3 - не стоит выбирать
 };
-
-/*
-struct player
-{
-    int n; // Номер
-    int h; // Рост
-    int w; // Размах рук
-    int s; // Среднее количество очков за матч
-    int r; // Среднее количество подборов за матч
-    int p; // Среднее количество передач за матч
-    int cat; // Категория: 0 - единорог, 1 - игрок, достойный выбора в первом раунде, 2 - во втором, 3 - не стоит выбирать
-};
-*/
-
-
-/*
-// запись структуры в файл
-int save(char* filename, struct player* p)
-{
-    FILE* fp;
-    char* c;
-    int size = sizeof(struct player); // количество записываемых байтов
-
-    fp = fopen(filename, "wb"); //открываем файл для бинарной записи
-    if (!fp)    // если не удалось открыть файл
-    {
-        printf("Error occured while opening file \n");
-        return 1;
-    }
-    // устанавливаем указатель на начало структуры
-    c = (char*)p;
-    // посимвольно записываем в файл структуру
-    for (int i = 0; i < size; i++)
-    {
-        putc(*c++, fp);
-    }
-    fclose(fp);
-    return 0;
-}
-
-// загрузка из файла структуры
-int load(char* filename)
-{
-    FILE* fp;
-    char* c;
-    int i; // для считывания одного символа
-    // количество считываемых байтов
-    int size = sizeof(struct player);
-    // выделяем память для считываемой структуры
-    struct player* ptr = (player*)malloc(size);
-    fp = fopen(filename, "rb");     // открываем файл для бинарного чтения
-    if (!fp)
-    {
-        printf("Error occured while opening file \n");
-        return 1;
-    }
-
-    // устанавливаем указатель на начало блока выделенной памяти
-    c = (char*)ptr;
-    // считываем посимвольно из файла
-    while ((i = getc(fp)) != EOF)
-    {
-        *c = i;
-        c++;
-    }
-
-    fclose(fp);
-    // вывод на консоль загруженной структуры
-    printf("%5d %5d \n", ptr->n, ptr->h);
-    free(ptr);
-    return 0;
-}
-*/
-
-
 
 Player giveCat(Player p) {
     int uni = 0; // особые параметры для единорога
@@ -235,36 +156,31 @@ Player giveCat(Player p) {
 }
 
 
-
-
-
 void writeDB(string path, Player p) {
     ofstream fout;
     fout.open(path, ofstream::app);
 
     if (!fout.is_open()) {
-        cout << "File opening error!\n";
+        cout << "Ошибка открытия файла!\n";
     }
     else {
-        //cout << "File is open!\n";
+        //cout << "Файл открыт!\n";
         fout.write((char*)&p, sizeof(Player));
     }
     fout.close();
 }
-
 
 void readDB(string path) {
     ifstream fin;
     fin.open(path, ofstream::app);
 
     if (!fin.is_open()) {
-        cout << "File opening error!\n";
+        cout << "Ошибка открытия файла!\n";
     }
     else {
-        //cout << "File is open!\n";
+        //cout << "Файл открыт!\n";
         Player p;
         while (fin.read((char*)&p, sizeof(Player))) {
-            //p.Print();
             p = giveCat(p);
             //writeDB(path, p);
             p.Print();
@@ -274,19 +190,7 @@ void readDB(string path) {
 }
 
 
-
-
-
-
-
 void taskOne() {
-    /* TODO:
-    - Понять что происходит
-    - Сделать
-    - Вывести результат на экран
-    - Вывести результат на экран красиво
-    */
-
     string path = "bd.txt";
 
     Player player;
@@ -308,31 +212,148 @@ void taskOne() {
         player.p = rand() % 11;
         writeDB(path, player);
     }
-    
+
 
     readDB(path);
 
-
-
-    /*
-    player dude;
-
-    char filename[] = "bd.txt";
-    // struct player* ptr = load(filename);
-    load(filename);
-    
-
-    string rez;
-    rez = "yoooooooooo suck it green boooiiii";
-    return rez;
-    */
 }
+
+
+
+
+int taskTwo() {
+    int n;
+    cout << "\nВведите количество кроликов (1-200 000): ";
+    cin >> n;
+    while (n > 200000 || n < 1) {
+        cout << "\tОШИБКА\n\tВведите количество кроликов (1-200 000): ";
+        cin >> n;
+    }
+    cout << "\n";
+
+    int* weights = new int[n];
+    int* weights_reset = new int[n];
+
+    for (int i = 0; i < n; i++) {
+        int j = i + 1;
+        cout << "Введите вес кролика " << j << " (1-109): ";
+        cin >> weights[i];
+        while (weights[i] > 109 || weights[i] < 1) {
+            cout << "\tОШИБКА\n\tВведите вес кролика " << j << " (1-109): ";
+            cin >> weights[i];
+        }
+        while(weights[i] < weights[i - 1] && i > 0) {
+            cout << "\tОШИБКА\n\tВведите вес кролика " << j << " (1-109) и больше предыдущего: ";
+            cin >> weights[i];
+        }
+        weights_reset[i] = weights[i];
+    }
+
+    int m;
+    cout << "\nВведите количество запросов (1-200 000): ";
+    cin >> m;
+    while (m > 200000 || m < 1) {
+        cout << "\tОШИБКА\n\tВведите количество запросов (1-200 000): ";
+        cin >> m;
+    }
+
+    for (int i = 0; i < m; i++) {
+        int li, ri;
+        cout << "\nВведите границы шеренги (от 1 до " << n << " и нижняя граница должна быть меньше большей): ";
+        cin >> li >> ri;
+        while (li >= ri || li < 1 || ri > n) {
+            cout << "\tОШИБКА\n\tВведите границы шеренги (от 1 до " << n << " и нижняя граница должна быть меньше большей): ";
+            cin >> li >> ri;
+        }
+
+        int days = 0;
+        /*
+        int max_weight = 0; // Максимальный вес кролика в шеренге
+
+        // Сортировка в шеренгу по возрастанию
+        
+        for (int i = li-1; i < ri-1; i++) {
+            for (int j = li - 1; j < ri - i - 1; j++) {
+                if (weights[j] > weights[j + 1]) {
+                    // Обмен элементов
+                    int temp = weights[j];
+                    weights[j] = weights[j + 1];
+                    weights[j + 1] = temp;
+                }
+            }
+        }
+        */
+
+        days = weights[ri - 1] - weights[li - 1];
+
+        // Проходим по кроликам от li до ri-1 и проверяем условие wi != wi+1 (вес текущего не равен весу следующего). 
+        // Если оно выполняется, увеличиваем вес i-го кролика на 1 и обновляем значение max_weight
+        /*
+        for (int i = li - 1; i < ri - 1; i++) {
+            if (weights[i] != weights[i + 1]) {
+                //weights[i]++;
+                max_weight = max(max_weight, weights[i]);
+            }
+        }
+        cout << "max_weight " << max_weight << endl;
+        
+        // Повторяем, пока max_weight < wri-1 (вес последнего кролика в шеренге).
+        while (max_weight < weights[ri - 1]) {
+            for (int i = li - 1; i < ri - 1; i++) {
+                if (weights[i] != weights[i + 1]) {
+                    weights[i]++;
+                    max_weight = max(max_weight, weights[i]);
+                }
+            }
+            days++;
+        }
+        */
+
+
+
+        cout << "Количество дней, после которых вес кроликов не будет меняться: " << days << endl;
+
+        /*
+        // Восстановление массива в прежнее состояние перед следующей итерацией
+        for (int i = 0; i < n; i++) {
+            weights[i] = weights_reset[i];
+            //cout << "weights[" << i << "] " << weights[i] << endl;
+        }
+        */
+    }
+
+    delete[] weights; // Освобождение памяти
+    delete[] weights_reset;
+
+    return 0;
+}
+
+
 
 
 
 int main()
 {
-    taskOne();
+    setlocale(LC_ALL, "Russian"); // Русская локализация консоли
+
+    int choise = 1;
+    while (choise != 0) {
+        cout << "\n\nМеню\n 1 - Первое задание (44)\n 2 - Второе задание (57)\n 0 - Выход\n>> ";
+        cin >> choise;
+        switch (choise)
+        {
+        case 1:
+            taskOne();
+            break;
+        case 2:
+            taskTwo();
+            break;
+        case 0:
+            break;
+        default:
+            break;
+        }
+    }
 
     /*
     string tmp;
