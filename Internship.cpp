@@ -149,24 +149,39 @@ Player giveCat(Player p) {
     return p;
 }
 
-
+/*
 void writeDB(string path, Player p) {
     // Открытие файла на запись
-    ofstream fout;
-    fout.open(path, ofstream::app);
+    //ofstream fout;
+    //fout.open(path, ofstream::app);
+    
+    ofstream fout(path, ios::binary | ios::app);
 
     if (!fout.is_open()) {
         cout << "Ошибка открытия файла!\n";
     }
     else {
         //cout << "Файл открыт!\n";
-        fout.write((char*)&p, sizeof(Player));
-        //fout.write((char*)&p, sizeof(p));
+        //fout.write((char*)&p, sizeof(Player));
+        fout.write(reinterpret_cast<char*>(&p), sizeof(Player));
+        fout.close();
     }
-    fout.close();
+    
+
+    ofstream fileOut(path, ios::binary | ios::app);
+    if (fileOut.is_open()) {
+        fileOut.write(reinterpret_cast<char*>(&p), sizeof(p));
+        fileOut.close();
+        cout << "Объект успешно записан в файл." << endl;
+    }
+    else {
+        cout << "Ошибка при открытии файла." << endl;
+    }
+    
     
 }
-
+*/
+/*
 void readDB(string path) {
     ifstream fin;
     fin.open(path, ofstream::app);
@@ -187,9 +202,89 @@ void readDB(string path) {
 }
 
 
+void readDB(string filePath) {
+    //Player players;
+    ifstream fileIn(filePath, ios::binary);
+    if (fileIn.is_open()) {
+        Player player;
+        while (fileIn.read(reinterpret_cast<char*>(&player), sizeof(player))) {
+            //players.insert(player);
+            player = giveCat(player);
+            player.Print();
+        }
+        fileIn.close();
+        cout << "Объекты успешно прочитаны из файла." << endl;
+    }
+    else {
+        cout << "Ошибка при открытии файла." << endl;
+    }
+    //return players;
+}
+*/
+
+
+void writeDB(const string& filename) {
+    ofstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Ошибка открытия файла!" << endl;
+        return;
+    }
+
+    Player players[32];
+    srand(time(NULL));
+    for (int i = 0; i < 32; i++) {
+        players[i].n = i;
+        players[i].h = rand() % 101 + 150;
+        players[i].w = rand() % 121 + 150;
+        players[i].s = rand() % 31 + 5;
+        players[i].r = rand() % 11;
+        players[i].p = rand() % 11;
+        file << players[i].h << " " << players[i].w << " " << players[i].s << " "
+             << players[i].r << " " << players[i].p << endl;
+    }
+
+    file.close();
+}
+
+void readDB(const string& filename) {
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Ошибка открытия файла!" << endl;
+        return;
+    }
+
+    int height, wingspan, points, rebounds, assists;
+    int numPlayers = 0;
+    Player players[32];
+
+    while (file >> height >> wingspan >> points >> rebounds >> assists) {
+        if (numPlayers < 32) {
+            players[numPlayers].n = numPlayers + 1;
+            players[numPlayers].h = height;
+            players[numPlayers].w = wingspan;
+            players[numPlayers].s = points;
+            players[numPlayers].r = rebounds;
+            players[numPlayers].p = assists;
+
+            players[numPlayers] = giveCat(players[numPlayers]);
+            players[numPlayers].Print();
+
+            numPlayers++;
+        }
+        else {
+            cout << "Достигнуто максимальное количество игроков." << endl;
+            break;
+        }
+    }
+
+    file.close();
+}
+
 void taskOne() {
     string path = "bd.txt";
-    Player player;
+    //Player player;
 
     // Отчистка файла перед новой записью
     fstream clear_file(path, ios::out);
@@ -203,6 +298,8 @@ void taskOne() {
         writeDB(path, player);
     }
     */
+
+    /*
     srand(time(NULL));
     for (int i = 0; i < 32; i++) {
         player.n = i;
@@ -213,11 +310,10 @@ void taskOne() {
         player.p = rand() % 11;
         writeDB(path, player);
     }
-
+    */
+    writeDB(path);
     readDB(path);
 }
-
-
 
 
 int taskTwo() {
@@ -337,7 +433,7 @@ int main()
 
     int choise = 1;
     while (choise != 0) {
-        cout << "\n\nМеню\n 1 - Первое задание (44)\n 2 - Второе задание (57)\n 0 - Выход\n>> ";
+        cout << "\n\t\tМеню\n\t 1 - Первое задание (44)\n\t 2 - Второе задание (57)\n\t 0 - Выход\n>> ";
         cin >> choise;
         switch (choise)
         {
